@@ -108,7 +108,7 @@ html[data-theme="game"] footer{display:none}
 
 /* 게시판 가운데 "클릭" 나무 팻말 */
 .hint{
-  position:absolute;left:9.1%;top:31.7%;translate:-50% -50%;
+  position:absolute;left:7.8%;top:31.6%;translate:-50% -50%;
   border:calc(var(--s)*.2) solid #5a3a22;border-radius:calc(var(--s)*.6);cursor:pointer;
   font:800 calc(var(--s)*1.05)/1 var(--body);color:#fff3d0;letter-spacing:.04em;white-space:nowrap;
   background:linear-gradient(#b5793f,#8f5a2b);padding:calc(var(--s)*.55) calc(var(--s)*1.2);
@@ -143,7 +143,7 @@ html[data-theme="game"] footer{display:none}
 
 /* ---- 접수원 말풍선 (돌멩이 오른쪽 위) ---- */
 .bubble{
-  position:absolute;z-index:66;left:55%;bottom:68%;width:24%;cursor:pointer;
+  position:absolute;z-index:66;left:55.5%;bottom:69%;width:24%;cursor:pointer;
   padding:calc(var(--s)*1) calc(var(--s)*1.5) calc(var(--s)*1.5);
   background:#fff;color:#2a2f4a;border:calc(var(--s)*.22) solid #2a3568;border-radius:calc(var(--s)*1.7);
   font-size:calc(var(--s)*1.2);line-height:1.6;box-shadow:0 calc(var(--s)*.4) 0 rgba(42,53,104,.18);
@@ -530,8 +530,10 @@ const onWall = (M, u, v, inner, sx = .8) => {
   const ang = Math.atan((q[1] - p[1]) / (q[0] - p[0])) * 180 / Math.PI;
   return `<g transform="translate(${f1(p[0])},${f1(p[1])}) skewY(${ang.toFixed(2)}) scale(${sx},1)">${inner}</g>`;
 };
-const BOARD_C = Lw(.78, .45);   // 게시판 중심 (줌인 목표)
-const BOARD_W = 252;            // 게시판 폭 (줌 배율 계산용)
+const VIEW_ZOOM = 1.1;          // 시점: 1보다 크면 홀 안쪽으로 다가간 느낌 (소실점 기준 확대)
+const zoomPt = p => [800 + (p[0] - 800) * VIEW_ZOOM, 300 + (p[1] - 300) * VIEW_ZOOM];
+const BOARD_C = zoomPt(Lw(.8375, .45));   // 게시판 중심 (줌인 목표)
+const BOARD_W = 206 * VIEW_ZOOM;          // 게시판 폭 (줌 배율 계산용)
 
 // 의뢰 포스트잇 위치 (게시판 안 %, 회전) — 프로젝트 순서대로 사용
 const NOTE_POS = [[11, 14, -4], [54, 40, 3.5], [74, 6, -2.5], [28, 58, 5], [82, 60, -5], [40, 8, 2], [6, 64, 3], [62, 72, -3]];
@@ -637,7 +639,7 @@ function sceneSVG() {
     <radialGradient id="fire"><stop offset="0" stop-color="#fff2a8"/><stop offset=".45" stop-color="#ffa53a"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
     <clipPath id="floorclip"><polygon points="300,470 1300,470 2000,708 2000,1100 -400,1100 -400,708"/></clipPath>
     <clipPath id="kclip"><path d="M1126,470 V330 A74,74 0 0 1 1274,330 V470 Z"/></clipPath>
-  </defs>`;
+  </defs><g transform="translate(800,300) scale(${VIEW_ZOOM}) translate(-800,-300)">`;
 
   /* ---------- 바닥 ---------- */
   s += `<g clip-path="url(#floorclip)"><rect x="-400" y="460" width="2400" height="640" fill="#d3995f"/>`;
@@ -766,46 +768,46 @@ function sceneSVG() {
 
   /* ---------- 오른쪽 벽: 큰 아치 창문, 선반 ---------- */
   {
-    const P = [Rw(.62, .62), Rw(.62, .32)];
-    for (let k = 0; k <= 16; k++) { const t = Math.PI * k / 16; P.push(Rw(.73 - .11 * Math.cos(t), .32 - .09 * Math.sin(t))); }
-    P.push(Rw(.84, .32), Rw(.84, .62));
+    const P = [Rw(.67, .62), Rw(.67, .32)];
+    for (let k = 0; k <= 16; k++) { const t = Math.PI * k / 16; P.push(Rw(.775 - .105 * Math.cos(t), .32 - .09 * Math.sin(t))); }
+    P.push(Rw(.88, .32), Rw(.88, .62));
     s += poly(P, `fill="url(#sky)" stroke="#8a5a2f" stroke-width="8" stroke-linejoin="round"`);
-    s += poly([Rw(.65,.58), Rw(.68,.4), Rw(.7,.4), Rw(.67,.58)], 'fill="#fff" opacity=".3"');
-    s += seg(Rw(.73, .23), Rw(.73, .62), 'stroke="#8a5a2f" stroke-width="5"') + seg(Rw(.62, .46), Rw(.84, .46), 'stroke="#8a5a2f" stroke-width="5"');
-    s += poly(quadOf(Rw, .6, .62, .86, .655), `fill="#b9803f" ${OL}`);
+    s += poly([Rw(.7,.58), Rw(.73,.4), Rw(.75,.4), Rw(.72,.58)], 'fill="#fff" opacity=".3"');
+    s += seg(Rw(.775, .23), Rw(.775, .62), 'stroke="#8a5a2f" stroke-width="5"') + seg(Rw(.67, .46), Rw(.88, .46), 'stroke="#8a5a2f" stroke-width="5"');
+    s += poly(quadOf(Rw, .65, .62, .9, .655), `fill="#b9803f" ${OL}`);
     const bottle = (x, col, h) => `<g transform="translate(${x},0)"><rect x="-4" y="${-h - 14}" width="8" height="8" rx="2" fill="#b9803f" ${OL2}/><rect x="-5" y="${-h - 8}" width="10" height="8" fill="#e8f2f6" ${OL2}/><circle cx="0" cy="${-h/2 + 2}" r="${h/2}" fill="${col}" ${OL2}/><circle cx="${-h/6}" cy="${-h/2 - h/6}" r="${h/7}" fill="#fff" opacity=".7"/></g>`;
     const book = (x, w, h, col) => `<g transform="translate(${x},0)"><rect x="0" y="${-h}" width="${w}" height="${h}" rx="2" fill="${col}" ${OL2}/><line x1="2" y1="${-h + 8}" x2="${w - 2}" y2="${-h + 8}" stroke="#f0c15a" stroke-width="2"/></g>`;
-    s += onWall(Rw, .935, .52, `${book(-110, 16, 50, "#b5432f")}${book(-93, 14, 44, "#3f6fb5")}${book(-78, 18, 54, "#5c8a4a")}
+    s += onWall(Rw, .955, .52, `${book(-110, 16, 50, "#b5432f")}${book(-93, 14, 44, "#3f6fb5")}${book(-78, 18, 54, "#5c8a4a")}
       ${bottle(-34, "#b46be8", 26)}${bottle(0, "#ff8fb0", 22)}${bottle(30, "#6fd1a1", 28)}
       <rect x="-122" y="0" width="190" height="11" rx="3" fill="#b9803f" ${OL}/>`, .42);
   }
 
   /* ---------- 왼쪽 벽: 촛대 + 의뢰 게시판 (클릭 영역) ---------- */
-  s += onWall(Lw, .985, .36, `<circle cx="0" cy="-20" r="40" fill="url(#lg)"/><path d="M-10,22 H10 L4,8 H-4 Z" fill="#8a5a2f" ${OL2}/><rect x="-3" y="-4" width="6" height="14" fill="#8a5a2f"/><rect x="-14" y="-10" width="28" height="8" rx="3" fill="#b9803f" ${OL2}/><rect x="-5" y="-30" width="10" height="20" rx="2" fill="#fff6e0" ${OL2}/><path class="flame" d="M0,-44 C-6,-38 -5,-33 0,-31 C5,-33 6,-38 0,-44 Z" fill="#ffb238"/>`, .5);
   {
+    const LB = (u, v) => Lw(.69 + (u - .6) * .8194, v);   // 게시판 자리 (시점에 맞춰 안쪽으로)
     s += `<g class="hot" id="boardHot" role="button" tabindex="0" aria-label="의뢰 게시판 열기">`;
-    s += poly(quadOf(Lw, .6, .2, .96, .72), `fill="#9a6233" ${OL}`);
-    s += poly(quadOf(Lw, .608, .225, .952, .695), 'fill="#b9803f"');
-    s += poly(quadOf(Lw, .62, .255, .94, .665), 'fill="#dba763" stroke="#8a5a2f" stroke-width="2"');
-    for (let i = 0; i < 110; i++) { const p = Lw(.625 + rnd() * .31, .265 + rnd() * .39); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="1.6" fill="rgba(120,75,30,.35)"/>`; }
-    [[.612,.235],[.948,.235],[.612,.685],[.948,.685]].forEach(([u, v]) => { const p = Lw(u, v); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(lerp(9, 5, u))}" fill="#e0b44a" ${OL2}/>`; });
-    [[.79,.32,"#e8a630"],[.9,.6,"#3a64c8"],[.68,.61,"#e0412f"]].forEach(([u, v, c]) => { const p = Lw(u, v); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(lerp(9, 5, u))}" fill="${c}"/>`; });
-    s += poly([Lw(.86,.29), Lw(.89,.29), Lw(.88,.31), Lw(.885,.33), Lw(.86,.32)], 'fill="#f6ecd2" stroke="rgba(90,58,34,.3)" stroke-width="1"');
+    s += poly(quadOf(LB, .6, .2, .96, .72), `fill="#9a6233" ${OL}`);
+    s += poly(quadOf(LB, .608, .225, .952, .695), 'fill="#b9803f"');
+    s += poly(quadOf(LB, .62, .255, .94, .665), 'fill="#dba763" stroke="#8a5a2f" stroke-width="2"');
+    for (let i = 0; i < 110; i++) { const p = LB(.625 + rnd() * .31, .265 + rnd() * .39); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="1.6" fill="rgba(120,75,30,.35)"/>`; }
+    [[.612,.235],[.948,.235],[.612,.685],[.948,.685]].forEach(([u, v]) => { const p = LB(u, v); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(lerp(9, 5, u))}" fill="#e0b44a" ${OL2}/>`; });
+    [[.79,.32,"#e8a630"],[.9,.6,"#3a64c8"],[.68,.61,"#e0412f"]].forEach(([u, v, c]) => { const p = LB(u, v); s += `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(lerp(9, 5, u))}" fill="${c}"/>`; });
+    s += poly([LB(.86,.29), LB(.89,.29), LB(.88,.31), LB(.885,.33), LB(.86,.32)], 'fill="#f6ecd2" stroke="rgba(90,58,34,.3)" stroke-width="1"');
     const SCENE_POS = [[.645, .285], [.82, .51], [.84, .285], [.66, .53], [.74, .285], [.74, .54], [.86, .4], [.64, .4]];
     inView("game").forEach((p, i) => {
       const [u0, v0] = SCENE_POS[i % SCENE_POS.length];
-      s += poly(quadOf(Lw, u0 + .003, v0 + .006, u0 + .073, v0 + .096), 'fill="rgba(60,30,10,.25)"');
-      s += poly(quadOf(Lw, u0, v0, u0 + .07, v0 + .09), `fill="${PAPERS[i % 4]}" stroke="rgba(90,58,34,.35)" stroke-width="1.5"`);
-      [.035, .052, .069].forEach((dv, k) => s += seg(Lw(u0 + .01, v0 + dv), Lw(u0 + .06 - k * .01, v0 + dv), 'stroke="rgba(70,50,25,.45)" stroke-width="1.6"'));
-      const pc = Lw(u0 + .035, v0 + .014);
+      s += poly(quadOf(LB, u0 + .003, v0 + .006, u0 + .073, v0 + .096), 'fill="rgba(60,30,10,.25)"');
+      s += poly(quadOf(LB, u0, v0, u0 + .07, v0 + .09), `fill="${PAPERS[i % 4]}" stroke="rgba(90,58,34,.35)" stroke-width="1.5"`);
+      [.035, .052, .069].forEach((dv, k) => s += seg(LB(u0 + .01, v0 + dv), LB(u0 + .06 - k * .01, v0 + dv), 'stroke="rgba(70,50,25,.45)" stroke-width="1.6"'));
+      const pc = LB(u0 + .035, v0 + .014);
       s += `<circle cx="${f1(pc[0])}" cy="${f1(pc[1])}" r="${f1(lerp(9, 5, u0))}" fill="#e0412f"/>`;
-      if (p.done) { const c = Lw(u0 + .035, v0 + .055); s += `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="${f1(lerp(18, 10, u0))}" fill="none" stroke="#c8281c" stroke-width="2.5"/>`; }
+      if (p.done) { const c = LB(u0 + .035, v0 + .055); s += `<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="${f1(lerp(18, 10, u0))}" fill="none" stroke="#c8281c" stroke-width="2.5"/>`; }
     });
-    const outer = quadOf(Lw, .59, .18, .97, .74);
+    const outer = quadOf(LB, .59, .18, .97, .74);
     s += poly(outer, 'class="glow"') + poly(outer, 'class="hl"');
     s += `</g>`;
   }
-  s += `<polygon points="1566,368 1412,354 1160,560 1440,610" fill="url(#shaft)"/>`;
+  s += `<polygon points="1535,366 1381,352 1150,560 1420,610" fill="url(#shaft)"/>`;
 
   /* ---------- 접수 카운터 (높이 약 1m) + 접수원 ---------- */
   const rcImg = (DATA.guild.receptionistImage || RECEPTIONIST_IMG);
@@ -860,7 +862,7 @@ function sceneSVG() {
     const x = 1200 + rnd() * 360, y = 360 + rnd() * 260;
     s += `<circle class="mote" cx="${f1(x)}" cy="${f1(y)}" r="${f1(1.6 + rnd() * 1.8)}" fill="#fffbe0" style="animation-delay:-${f1(rnd() * 7)}s;animation-duration:${f1(5 + rnd() * 5)}s"/>`;
   }
-  s += `<rect x="-400" y="-200" width="2400" height="1300" fill="url(#vig)" pointer-events="none"/></svg>`;
+  s += `</g><rect x="-400" y="-200" width="2400" height="1300" fill="url(#vig)" pointer-events="none"/></svg>`;
   return s;
 }
 
